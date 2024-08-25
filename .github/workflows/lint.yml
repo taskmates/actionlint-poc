@@ -31,3 +31,4 @@ jobs:
         run: |
           echo "Actionlint found the following issues:"
           echo "${{ steps.actionlint.outputs.stdout }}"
+          echo "${{ steps.actionlint.outputs.stderr }}"
