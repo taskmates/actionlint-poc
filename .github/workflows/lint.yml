@@ -1,0 +1,20 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run actionlint
+        id: actionlint
+        uses: raven-actions/actionlint@v2
+        with:
+          fail-on-error: false
