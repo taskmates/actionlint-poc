@@ -27,6 +27,7 @@ jobs:
           export TASKMATES_HOME=${{ runner.temp }}/.taskmates
           echo TASKMATES_HOME=$TASKMATES_HOME >> $GITHUB_ENV
           
+          mkdir -p "$TASKMATES_HOME/private"
           cat <<EOF >> "$TASKMATES_HOME/private/linting_fixer.md"
           ---
           tools:
@@ -69,6 +70,7 @@ jobs:
           echo Running Taskmates...
           
           cat "$MARKDOWN_CHAT_PATH" | taskmates complete \
+              --model=gpt-4o \
               --max-steps=20 \
               --format full | tee "$RUNNER_TEMP/response.md"
 
