@@ -23,6 +23,11 @@ jobs:
         uses: srizzo/actionlint@adjustments
         with:
           fail-on-error: false
+      - name: Stop Github markers
+        if: steps.actionlint.outputs.exit-code != 0
+        run: |
+          stopMarker=$(uuidgen)
+          echo "::stop-commands::$stopMarker"
       - name: Install Taskmates
         if: steps.actionlint.outputs.exit-code != 0
         uses: taskmates/install-taskmates@v1
