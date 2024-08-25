@@ -40,26 +40,6 @@ jobs:
         run: |
           export TASKMATES_HOME=${{ runner.temp }}/.taskmates
           echo TASKMATES_HOME=$TASKMATES_HOME >> $GITHUB_ENV
-          
-          mkdir -p "$TASKMATES_HOME/private"
-          cat <<EOF >> "$TASKMATES_HOME/private/linting_fixer.md"
-          ---
-          tools:
-            read_file:
-              allow: ".github/workflows/*"
-            write_file:
-              allow: ".github/workflows/*"
-          ---
-          
-          You're a helpful AI Agent that fixes linting issues.
-          
-          Read the full content of each affected file before making any changes.
-          
-          Only fix the linting issues mentioned in the chat. Do not make any other changes.
-          
-          Skip any issues that you're not sure how to fix. 
-          
-          EOF
 
       - name: Compose Chat
         if: steps.actionlint.outputs.exit-code != 0
@@ -101,8 +81,9 @@ jobs:
           
           # Check for uncommitted changes in workflows
           if [[ -n $(git status --porcelain .github/workflows) ]]; then
-            # Set branch name, PR title, and PR body
-            BRANCH_NAME="fix-workflow-linting"
+            # Set branch name with timestamp, PR title, and PR body
+            TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
+            BRANCH_NAME="taskmates-fix-workflow-linting-${TIMESTAMP}"
             PR_TITLE="Fix workflow linting issues"
             PR_BODY="This PR addresses linting issues in the GitHub Actions workflows."
           
@@ -110,18 +91,8 @@ jobs:
             git config user.name "GitHub Actions"
             git config user.email "actions@github.com"
           
-            # Set up authentication for git operations
-            # git config --global url."https://${GH_TOKEN}@github.com/".insteadOf "https://github.com/"
-          
-            # Check if branch exists
-            if git ls-remote --exit-code --heads origin $BRANCH_NAME; then
-              # Branch exists, switch to it
-              git fetch origin $BRANCH_NAME
-              git checkout $BRANCH_NAME
-            else
-              # Branch doesn't exist, create it
-              git checkout -b $BRANCH_NAME
-            fi
+            # Create and switch to the new branch
+            git checkout -b $BRANCH_NAME
           
             # Add changes and commit
             git add .github/workflows
@@ -130,13 +101,8 @@ jobs:
             # Push the branch
             git push origin $BRANCH_NAME
           
-            # Check if PR already exists
-            if ! gh pr list --head $BRANCH_NAME --json number | grep -q '"number":'; then
-              # Create the PR if it doesn't exist
-              gh pr create --title "$PR_TITLE" --body "$PR_BODY" --base main --head $BRANCH_NAME
-            else
-              echo "PR already exists. Skipping PR creation."
-            fi
+            # Create the PR
+            gh pr create --title "$PR_TITLE" --body "$PR_BODY" --base main --head $BRANCH_NAME
           else
             echo "No changes to workflows. Skipping PR creation."
           fi
