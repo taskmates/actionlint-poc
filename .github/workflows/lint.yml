@@ -92,20 +92,25 @@ jobs:
 
       - name: Create PR
         if: steps.actionlint.outputs.exit-code != 0 && steps.run_taskmates.conclusion == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.ACTIONLINT_POC_GITHUB_TOKEN }}
         run: |
           set -Eeuo pipefail 
-
+          
           # Check for uncommitted changes in workflows
           if [[ -n $(git status --porcelain .github/workflows) ]]; then
             # Set branch name, PR title, and PR body
             BRANCH_NAME="fix-workflow-linting"
             PR_TITLE="Fix workflow linting issues"
             PR_BODY="This PR addresses linting issues in the GitHub Actions workflows."
-
+          
             # Configure git
             git config user.name "GitHub Actions"
             git config user.email "actions@github.com"
-
+          
+            # Set up authentication for git operations
+            git config --global url."https://${GH_TOKEN}@github.com/".insteadOf "https://github.com/"
+          
             # Check if branch exists
             if git ls-remote --exit-code --heads origin $BRANCH_NAME; then
               # Branch exists, switch to it
@@ -115,14 +120,14 @@ jobs:
               # Branch doesn't exist, create it
               git checkout -b $BRANCH_NAME
             fi
-
+          
             # Add changes and commit
             git add .github/workflows
             git commit -m "Fix workflow linting issues"
-
+          
             # Push the branch
             git push origin $BRANCH_NAME
-
+          
             # Check if PR already exists
             if ! gh pr list --head $BRANCH_NAME --json number | grep -q '"number":'; then
               # Create the PR if it doesn't exist
