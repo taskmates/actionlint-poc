@@ -109,7 +109,7 @@ jobs:
             git config user.email "actions@github.com"
           
             # Set up authentication for git operations
-            git config --global url."https://${GH_TOKEN}@github.com/".insteadOf "https://github.com/"
+            # git config --global url."https://${GH_TOKEN}@github.com/".insteadOf "https://github.com/"
           
             # Check if branch exists
             if git ls-remote --exit-code --heads origin $BRANCH_NAME; then
