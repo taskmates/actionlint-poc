@@ -4,17 +4,18 @@ jobs:
   test:
     strategy:
       matrix:
-        os: [ macos-latest, linux-latest ]
+        os: [ macos-latest, ubuntu-latest ]
     runs-on: ${{ matrix.os }}
     steps:
       - run: echo "Checking commit '${{ github.event.head_commit.message }}'"
+        env:
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node_version: 18.x
+          node-version: 18.x
       - uses: actions/cache@v4
         with:
           path: ~/.npm
-          key: ${{ matrix.platform }}-node-${{ hashFiles('**/package-lock.json') }}
-        if: ${{ github.repository.permissions.admin == true }}
+          key: ${{ matrix.os }}-node-${{ hashFiles('**/package-lock.json') }}
       - run: npm install && npm test
