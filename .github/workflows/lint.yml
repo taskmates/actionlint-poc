@@ -38,14 +38,14 @@ jobs:
       - name: Set up Taskmates
         if: steps.actionlint.outputs.exit-code != 0
         run: |
-          export TASKMATES_HOME=${{ runner.temp }}/.taskmates
-          echo TASKMATES_HOME=$TASKMATES_HOME >> $GITHUB_ENV
+          export TASKMATES_HOME="${{ runner.temp }}/.taskmates"
+          echo "TASKMATES_HOME=$TASKMATES_HOME" >> "$GITHUB_ENV"
 
       - name: Compose Chat
         if: steps.actionlint.outputs.exit-code != 0
         run: |
-          export MARKDOWN_CHAT_PATH=${{ runner.temp }}/chat.md
-          echo MARKDOWN_CHAT_PATH=$MARKDOWN_CHAT_PATH >> $GITHUB_ENV
+          export MARKDOWN_CHAT_PATH="${{ runner.temp }}/chat.md"
+          echo "MARKDOWN_CHAT_PATH=$MARKDOWN_CHAT_PATH" >> "$GITHUB_ENV"
           
           cat <<EOF >> "$MARKDOWN_CHAT_PATH"
           Hey @linting_fixer, please fix the following issues: 
@@ -61,7 +61,7 @@ jobs:
         run: |
           set -Eeuo pipefail
           
-          echo Running Taskmates...
+          echo "Running Taskmates..."
           
           taskmates complete \
               --model=gpt-4o \
@@ -99,17 +99,17 @@ jobs:
             git config user.email "actions@github.com"
           
             # Create and switch to the new branch
-            git checkout -b $BRANCH_NAME
+            git checkout -b "$BRANCH_NAME"
           
             # Add changes and commit
             git add .github/workflows
             git commit -m "Fix workflow linting issues"
           
             # Push the branch
-            git push origin $BRANCH_NAME
+            git push origin "$BRANCH_NAME"
           
             # Create the PR
-            gh pr create --title "$PR_TITLE" --body "$PR_BODY" --base main --head $BRANCH_NAME
+            gh pr create --title "$PR_TITLE" --body "$PR_BODY" --base main --head "$BRANCH_NAME"
           else
             echo "No changes to workflows. Skipping PR creation."
           fi
