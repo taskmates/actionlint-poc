@@ -18,6 +18,8 @@ jobs:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.ACTIONLINT_POC_GITHUB_TOKEN }}
       - name: Run actionlint
         id: actionlint
         uses: srizzo/actionlint@adjustments
