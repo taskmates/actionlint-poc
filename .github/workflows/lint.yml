@@ -52,8 +52,6 @@ jobs:
           
           "$ACTIONLINT_STDOUT"
           EOF
-          
-          cat "$MARKDOWN_CHAT_PATH"
         env:
           ACTIONLINT_STDOUT: ${{ steps.actionlint.outputs.stdout }}
 
@@ -65,12 +63,21 @@ jobs:
           
           echo Running Taskmates...
           
-          cat "$MARKDOWN_CHAT_PATH" | taskmates complete \
+          taskmates complete \
               --model=gpt-4o \
               --max-steps=20 \
-              --format full | tee "$RUNNER_TEMP/response.md"
+              --format full < "$MARKDOWN_CHAT_PATH" > "$RUNNER_TEMP/response.md"
 
           cp "$RUNNER_TEMP/response.md" "$MARKDOWN_CHAT_PATH"
+
+      - name: Upload Taskmates artifacts
+        if: steps.actionlint.outputs.exit-code != 0
+        uses: actions/upload-artifact@v4
+        with:
+          name: taskmates-artifacts
+          path: |
+            ${{ runner.temp }}/chat.md
+            ${{ runner.temp }}/response.md
 
       - name: Create PR
         if: steps.actionlint.outputs.exit-code != 0 && steps.run_taskmates.conclusion == 'success'
