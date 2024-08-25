@@ -44,7 +44,7 @@ jobs:
       - name: Compose Chat
         if: steps.actionlint.outputs.exit-code != 0
         run: |
-          export MARKDOWN_CHAT_PATH=${{ runner.temp }}/chat.md
+          export MARKDOWN_CHAT_PATH=${{ runner.temp }}/request.md
           echo MARKDOWN_CHAT_PATH=$MARKDOWN_CHAT_PATH >> $GITHUB_ENV
           
           cat <<EOF >> "$MARKDOWN_CHAT_PATH"
@@ -59,9 +59,9 @@ jobs:
         if: steps.actionlint.outputs.exit-code != 0
         uses: actions/upload-artifact@v4
         with:
-          name: taskmates-artifacts
+          name: request.md
           path: |
-            ${{ runner.temp }}/chat.md
+            ${{ runner.temp }}/request.md
           compression-level: 0
 
       - name: Run Taskmates
@@ -83,7 +83,7 @@ jobs:
         if: steps.actionlint.outputs.exit-code != 0
         uses: actions/upload-artifact@v4
         with:
-          name: taskmates-artifacts
+          name: response.md
           path: |
             ${{ runner.temp }}/response.md
           compression-level: 0
