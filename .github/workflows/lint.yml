@@ -18,12 +18,16 @@ jobs:
         uses: raven-actions/actionlint@v2
         with:
           fail-on-error: false
-      - name: Install Taskmates
-        uses: taskmates/install-taskmates@v1
-        with:
-          version: main
-      - name: Set up Taskmates
+#      - name: Install Taskmates
+#        uses: taskmates/install-taskmates@v1
+#        with:
+#          version: main
+#      - name: Set up Taskmates
+#        run: |
+#          export TASKMATES_HOME=${{ runner.temp }}/.taskmates
+#          echo TASKMATES_HOME=$TASKMATES_HOME >> $GITHUB_ENV
+      - name: Display actionlint results
+        if: ${{ steps.actionlint.outputs.exit-code != 0 }}
         run: |
-          export TASKMATES_HOME=${{ runner.temp }}/.taskmates
-          echo TASKMATES_HOME=$TASKMATES_HOME >> $GITHUB_ENV
-
+          echo "Actionlint found the following issues:"
+          echo "${{ steps.actionlint.outputs.stdout }}"
