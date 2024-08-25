@@ -91,7 +91,7 @@ jobs:
           cp "$RUNNER_TEMP/response.md" "$MARKDOWN_CHAT_PATH"
 
       - name: Create PR
-        if: steps.actionlint.outputs.exit-code != 0
+        if: steps.actionlint.outputs.exit-code != 0 && steps.run_taskmates.conclusion == 'success'
         run: |
           set -Eeuo pipefail 
 
