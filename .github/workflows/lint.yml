@@ -18,23 +18,33 @@ jobs:
         uses: srizzo/actionlint@adjustments
         with:
           fail-on-error: false
-#      - name: Install Taskmates
-#        uses: taskmates/install-taskmates@v1
-#        with:
-#          version: main
+      - name: Install Taskmates
+        uses: taskmates/install-taskmates@v1
+        with:
+          version: main
       - name: Set up Taskmates
         run: |
           export TASKMATES_HOME=${{ runner.temp }}/.taskmates
           echo TASKMATES_HOME=$TASKMATES_HOME >> $GITHUB_ENV
           
-
-#      - name: Display actionlint results
-#        if: ${{ steps.actionlint.outputs.exit-code != 0 }}
-#        run: |
-#          echo "Actionlint found the following issues:"
-#          echo "$ACTIONLINT_STDOUT"
-#        env:
-#          ACTIONLINT_STDOUT: ${{ steps.actionlint.outputs.stdout }}
+          cat <<EOF >> "$TASKMATES_HOME/private/linting_fixer.md"
+          ---
+          tools:
+            read_file:
+              allow: ".github/workflows/*"
+            write_file:
+              allow: ".github/workflows/*"
+          ---
+          
+          You're a helpful AI Agent that fixes linting issues.
+          
+          Read the full content of each affected file before making any changes.
+          
+          Only fix the linting issues mentioned in the chat. Do not make any other changes.
+          
+          Skip any issues that you're not sure how to fix. 
+          
+          EOF
 
       - name: Compose Chat
         run: |
@@ -42,7 +52,7 @@ jobs:
           echo MARKDOWN_CHAT_PATH=$MARKDOWN_CHAT_PATH >> $GITHUB_ENV
           
           cat <<EOF >> "$MARKDOWN_CHAT_PATH"
-          Please fix the following linting issues: 
+          Hey @linting_fixer, please fix the following issues: 
           
           "$ACTIONLINT_STDOUT"
           EOF
@@ -51,3 +61,15 @@ jobs:
         env:
           ACTIONLINT_STDOUT: ${{ steps.actionlint.outputs.stdout }}
 
+      - name: Run Taskmates
+        id: run_taskmates
+        run: |
+          set -Eeuo pipefail
+          
+          echo Running Taskmates...
+          
+          cat "$MARKDOWN_CHAT_PATH" | taskmates complete \
+              --max-steps=20 \
+              --format full | tee "$RUNNER_TEMP/response.md"
+
+          cp "$RUNNER_TEMP/response.md" "$MARKDOWN_CHAT_PATH"
