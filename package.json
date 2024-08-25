@@ -1,0 +1,11 @@
+{
+  "name": "actionlint-poc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"All good\""
+  },
+  "author": "",
+  "license": "ISC"
+}
