@@ -38,8 +38,8 @@ jobs:
       - name: Set up Taskmates
         if: steps.actionlint.outputs.exit-code != 0
         run: |
-          export TASKMATES_HOME=${{ runner.temp }}/.taskmates
-          echo TASKMATES_HOME=$TASKMATES_HOME >> $GITHUB_ENV
+          export TASKMATES_HOME="${{ runner.temp }}/.taskmates"
+          echo "TASKMATES_HOME=$TASKMATES_HOME" >> "$GITHUB_ENV"
           
           mkdir -p "$TASKMATES_HOME/private"
           cat <<EOF >> "$TASKMATES_HOME/private/linting_fixer.md"
@@ -64,8 +64,8 @@ jobs:
       - name: Compose Chat
         if: steps.actionlint.outputs.exit-code != 0
         run: |
-          export MARKDOWN_CHAT_PATH=${{ runner.temp }}/chat.md
-          echo MARKDOWN_CHAT_PATH=$MARKDOWN_CHAT_PATH >> $GITHUB_ENV
+          export MARKDOWN_CHAT_PATH="${{ runner.temp }}/chat.md"
+          echo "MARKDOWN_CHAT_PATH=$MARKDOWN_CHAT_PATH" >> "$GITHUB_ENV"
           
           cat <<EOF >> "$MARKDOWN_CHAT_PATH"
           Hey @linting_fixer, please fix the following issues: 
@@ -83,7 +83,7 @@ jobs:
         run: |
           set -Eeuo pipefail
           
-          echo Running Taskmates...
+          echo "Running Taskmates..."
           
           cat "$MARKDOWN_CHAT_PATH" | taskmates complete \
               --model=gpt-4o \
