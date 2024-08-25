@@ -22,5 +22,8 @@ jobs:
         uses: taskmates/install-taskmates@v1
         with:
           version: main
-      - name: Verify Taskmates
-        run: taskmates --version
+      - name: Set up Taskmates
+        run: |
+          export TASKMATES_HOME=${{ runner.temp }}/.taskmates
+          echo TASKMATES_HOME=$TASKMATES_HOME >> $GITHUB_ENV
+
