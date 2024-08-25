@@ -55,6 +55,15 @@ jobs:
         env:
           ACTIONLINT_STDOUT: ${{ steps.actionlint.outputs.stdout }}
 
+      - name: Upload request
+        if: steps.actionlint.outputs.exit-code != 0
+        uses: actions/upload-artifact@v4
+        with:
+          name: taskmates-artifacts
+          path: |
+            ${{ runner.temp }}/chat.md
+          compression-level: 0
+
       - name: Run Taskmates
         id: run_taskmates
         if: steps.actionlint.outputs.exit-code != 0
@@ -70,14 +79,14 @@ jobs:
 
           cp "$RUNNER_TEMP/response.md" "$MARKDOWN_CHAT_PATH"
 
-      - name: Upload Taskmates artifacts
+      - name: Upload response
         if: steps.actionlint.outputs.exit-code != 0
         uses: actions/upload-artifact@v4
         with:
           name: taskmates-artifacts
           path: |
-            ${{ runner.temp }}/chat.md
             ${{ runner.temp }}/response.md
+          compression-level: 0
 
       - name: Create PR
         if: steps.actionlint.outputs.exit-code != 0 && steps.run_taskmates.conclusion == 'success'
