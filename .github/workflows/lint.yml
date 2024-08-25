@@ -18,3 +18,9 @@ jobs:
         uses: raven-actions/actionlint@v2
         with:
           fail-on-error: false
+      - name: Install Taskmates
+        uses: taskmates/install-taskmates@v1
+        with:
+          version: main
+      - name: Verify Taskmates
+        run: taskmates --version
